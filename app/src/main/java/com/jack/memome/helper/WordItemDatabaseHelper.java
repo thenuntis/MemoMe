@@ -3,6 +3,7 @@ package com.jack.memome.helper;
 import android.content.ContentValues;
 import android.content.Context;
 import android.database.sqlite.SQLiteDatabase;
+import android.util.Log;
 import com.jack.memome.models.WordItem;
 
 import java.util.Date;
@@ -31,16 +32,25 @@ public class WordItemDatabaseHelper {
     public void addWordIntoDB (WordItem item) {
         SQLiteDatabase helper = db.getReadableDatabase();
         helper.beginTransaction();
-        ContentValues values = new ContentValues();
-        values.put(DatabaseHelper.ID_COLUMN,item.getWordId());
-        values.put(DatabaseHelper.WORD_COLUMN,item.getWord());
-        values.put(DatabaseHelper.DATE_COLUMN,new Date().getTime());
-        int rows = helper.update(DatabaseHelper.ORIGINAL_WORDS_TABLE, values,
-                DatabaseHelper.ID_COLUMN + "= ?", new String[]{String.valueOf(item.getWordId())});
-        if(rows !=1) {
 
+        try {
+            ContentValues values = new ContentValues();
+            values.put(DatabaseHelper.ID_COLUMN,item.getWordId());
+            values.put(DatabaseHelper.WORD_COLUMN,item.getWord());
+            values.put(DatabaseHelper.DATE_COLUMN,new Date().getTime());
+            values.put(DatabaseHelper.TRANSLATE_WORD_COLUMN,item.getTranslatedWord());
+            values.put(DatabaseHelper.COMMENT_WORD_COLUMN,item.getCommentWord());
+            int rows = helper.update(DatabaseHelper.WORDS_TABLE, values,
+                    DatabaseHelper.ID_COLUMN + "= ?", new String[]{String.valueOf(item.getWordId())});
+            if(rows != 1 ) {
+                helper.insertOrThrow(DatabaseHelper.WORDS_TABLE,null,values);
+            }
+            helper.setTransactionSuccessful();
+        } catch (Exception e) {
+            Log.d("WordItemDatabaseHelper", "Error while trying to add word to Words table");
+        } finally {
+            helper.endTransaction();
         }
-
     }
 
     public void delWordFromDB (WordItem item) {

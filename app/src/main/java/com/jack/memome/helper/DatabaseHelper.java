@@ -12,30 +12,20 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     private static final String DATABASE_NAME = "memomedb.db";
     private static final int SCHEMA = 1;
     private static DatabaseHelper sDatabaseHelper;
-    static final String ORIGINAL_WORDS_TABLE = "originalword";
-    static final String TRANSLATED_WORDS_TABLE = "translatedword";
-    static final String COMMENT_WORDS_TABLE = "commentword";
+    static final String WORDS_TABLE = "foreignwords";
     static final String WORD_COLUMN = "word";
+    static final String TRANSLATE_WORD_COLUMN = "translate";
+    static final String COMMENT_WORD_COLUMN = "comment";
     static final String ID_COLUMN = "_id";
-    static final String ORIGINAL_ID_COLUMN = "original_id";
     static final String DATE_COLUMN = "edit_date";
     static final String TEST_MARK_COLUMN = "useintest";
-    private String originalWordSql = "create table " + ORIGINAL_WORDS_TABLE + "("
+
+    private String originalWordSql = "create table " + WORDS_TABLE + "("
             + ID_COLUMN + " integer primary key autoincrement, "
             + WORD_COLUMN + " text not null, "
+            + TRANSLATE_WORD_COLUMN + " text not null, "
+            + COMMENT_WORD_COLUMN + " text not null, "
             + TEST_MARK_COLUMN + " boolean, "
-            + DATE_COLUMN + " datetime" + ")";
-    private String translateWordSql = "create table " + TRANSLATED_WORDS_TABLE + "("
-            + ID_COLUMN + " integer primary key autoincrement, "
-            + ORIGINAL_ID_COLUMN + " integer not null "
-            + "REFERENCES " + ORIGINAL_WORDS_TABLE + " (" + ID_COLUMN + "), "
-            + WORD_COLUMN + " text not null, "
-            + DATE_COLUMN + " datetime" + ")";
-    private String commentWordSql = "create table " + COMMENT_WORDS_TABLE + "("
-            + ID_COLUMN + " integer primary key autoincrement, "
-            + ORIGINAL_ID_COLUMN + " integer not null "
-            + "REFERENCES " + ORIGINAL_WORDS_TABLE + " (" + ID_COLUMN + "), "
-            + WORD_COLUMN + " text not null, "
             + DATE_COLUMN + " datetime" + ")";
 
     private DatabaseHelper (Context context) {
@@ -59,8 +49,6 @@ public class DatabaseHelper extends SQLiteOpenHelper {
     @Override
     public void onCreate(SQLiteDatabase db) {
         db.execSQL(originalWordSql);
-        db.execSQL(translateWordSql);
-        db.execSQL(commentWordSql);
     }
 
     @Override
